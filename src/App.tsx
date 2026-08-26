@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Landing from "@/components/Landing";
+import DeploymentStatus from "@/components/DeploymentStatus";
 
 function App(){
 
@@ -9,6 +10,7 @@ function App(){
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/landing" element={<Landing />}/>
+        <Route path="/deploy/:id" element={<DeploymentStatus />} />
       </Routes>
       
     </>
