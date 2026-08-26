@@ -6,6 +6,7 @@ export type StepStatus = "pending" | "active" | "complete" | "failed";
 export type PipelineStep = {
   key: string;
   label: string;
+  shortLabel: string;
   description: string;
   status: StepStatus;
 };
@@ -18,6 +19,7 @@ export type DeploymentError = {
 };
 
 export type DeploymentState = {
+  deploymentId: string | null;
   steps: PipelineStep[];
   currentStepIndex: number;
   status: "idle" | "uploading" | "deploying" | "deployed" | "failed";
@@ -31,17 +33,17 @@ export type DeploymentState = {
 
 // Exact 7 execution steps matching the actual backend pipeline
 export const PIPELINE_STEPS: Omit<PipelineStep, "status">[] = [
-  { key: "CLONING", label: "Cloning", description: "Cloning the Git repository" },
-  { key: "UPLOADING_SOURCE", label: "Uploading Source", description: "Uploading source files to S3" },
-  { key: "QUEUED", label: "Queued", description: "Deployment queued" },
-  { key: "DOWNLOADING", label: "Downloading", description: "Downloading source from S3" },
-  { key: "BUILDING", label: "Building", description: "Building project (npm install & build)" },
-  { key: "UPLOADING_BUILD", label: "Uploading Build", description: "Uploading build artifacts" },
-  { key: "DEPLOYED", label: "Deployed", description: "Site is live" },
+  { key: "CLONING", label: "Cloning", shortLabel: "Clone", description: "Cloning git repository" },
+  { key: "UPLOADING_SOURCE", label: "Uploading Source", shortLabel: "Upload", description: "Uploading source to S3" },
+  { key: "QUEUED", label: "Queued", shortLabel: "Queue", description: "Queued in SQS" },
+  { key: "DOWNLOADING", label: "Downloading", shortLabel: "Download", description: "Downloading source from S3" },
+  { key: "BUILDING", label: "Building", shortLabel: "Build", description: "Building project (install & build)" },
+  { key: "UPLOADING_BUILD", label: "Uploading Build", shortLabel: "Deploy", description: "Uploading build artifacts" },
+  { key: "DEPLOYED", label: "Deployed", shortLabel: "Live", description: "Site is live" },
 ];
 
 const STATUS_TO_STEP_INDEX: Record<string, number> = {
-  QUEUED: 3,
+  QUEUED: 2,
   DOWNLOADING: 3,
   BUILDING: 4,
   UPLOADING_BUILD: 5,
@@ -63,19 +65,20 @@ function buildSteps(activeIndex: number, failed: boolean): PipelineStep[] {
   });
 }
 
-function getInitialDeploymentState(
-  id: string | undefined,
-  uploadComplete: boolean,
-  uploadError: DeploymentError | null
+function getInitialState(
+  initialId: string | undefined,
+  repoUrl: string | undefined,
+  initialError: DeploymentError | null
 ): DeploymentState {
-  if (uploadError) {
-    const failedIndex = PIPELINE_STEPS.findIndex(s => s.key === uploadError.step);
+  if (initialError) {
+    const failedIndex = PIPELINE_STEPS.findIndex(s => s.key === initialError.step);
     const idx = failedIndex >= 0 ? failedIndex : 0;
     return {
+      deploymentId: initialId && initialId !== "init" ? initialId : null,
       steps: buildSteps(idx, true),
       currentStepIndex: idx,
       status: "failed",
-      error: uploadError,
+      error: initialError,
       logs: [],
       isComplete: false,
       isFailed: true,
@@ -84,8 +87,11 @@ function getInitialDeploymentState(
     };
   }
 
-  if (id && uploadComplete) {
+  const isKnownId = initialId && initialId !== "init" && initialId !== "pending";
+
+  if (isKnownId) {
     return {
+      deploymentId: initialId,
       steps: buildSteps(3, false),
       currentStepIndex: 3,
       status: "deploying",
@@ -98,8 +104,9 @@ function getInitialDeploymentState(
     };
   }
 
-  if (id) {
+  if (repoUrl) {
     return {
+      deploymentId: null,
       steps: buildSteps(0, false),
       currentStepIndex: 0,
       status: "uploading",
@@ -113,6 +120,7 @@ function getInitialDeploymentState(
   }
 
   return {
+    deploymentId: null,
     steps: buildSteps(0, false),
     currentStepIndex: 0,
     status: "idle",
@@ -126,56 +134,100 @@ function getInitialDeploymentState(
 }
 
 export function useDeploymentStatus(
-  id: string | undefined,
-  uploadComplete: boolean,
-  uploadError: DeploymentError | null
+  initialId: string | undefined,
+  repoUrl: string | undefined,
+  initialError: DeploymentError | null,
+  onIdAssigned?: (newId: string) => void
 ): DeploymentState {
   const [state, setState] = useState<DeploymentState>(() =>
-    getInitialDeploymentState(id, uploadComplete, uploadError)
+    getInitialState(initialId, repoUrl, initialError)
   );
+
+  const [activeId, setActiveId] = useState<string | null>(() => {
+    return initialId && initialId !== "init" && initialId !== "pending" ? initialId : null;
+  });
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const logsRef = useRef<string[]>([]);
   const isTerminalRef = useRef<boolean>(false);
+  const uploadInitiatedRef = useRef<boolean>(false);
 
-  // Track upload phase progress (steps 0-2 handled by POST lifecycle)
+  // Phase 1: Upload Trigger (if starting fresh from repoUrl)
   useEffect(() => {
-    if (!id || uploadError || uploadComplete) return;
+    if (activeId || !repoUrl || uploadInitiatedRef.current || initialError) return;
 
+    uploadInitiatedRef.current = true;
+
+    // Simulate stepping during upload phase
     const t1 = setTimeout(() => {
-      setState(prev => {
-        if (prev.status !== "uploading") return prev;
-        return {
-          ...prev,
-          steps: buildSteps(1, false),
-          currentStepIndex: 1,
-        };
-      });
+      setState(prev => (prev.status === "uploading" ? { ...prev, steps: buildSteps(1, false), currentStepIndex: 1 } : prev));
     }, 2000);
 
     const t2 = setTimeout(() => {
-      setState(prev => {
-        if (prev.status !== "uploading") return prev;
-        return {
-          ...prev,
-          steps: buildSteps(2, false),
-          currentStepIndex: 2,
-        };
-      });
+      setState(prev => (prev.status === "uploading" ? { ...prev, steps: buildSteps(2, false), currentStepIndex: 2 } : prev));
     }, 5000);
+
+    axios.post("http://localhost:3000/api/v1/upload", { url: repoUrl })
+      .then((res) => {
+        const newId = res.data?.id;
+        if (newId) {
+          setActiveId(newId);
+          onIdAssigned?.(newId);
+          setState(prev => ({
+            ...prev,
+            deploymentId: newId,
+            steps: buildSteps(3, false),
+            currentStepIndex: 3,
+            status: "deploying",
+            connectionStatus: "connecting",
+          }));
+        }
+      })
+      .catch((err: unknown) => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        let errorObj: DeploymentError = {
+          step: "CLONING",
+          message: "Failed to upload and queue deployment repository",
+        };
+
+        if (axios.isAxiosError(err)) {
+          const errData = err.response?.data?.error;
+          if (errData) {
+            errorObj = errData;
+          } else {
+            errorObj.message = err.message || "Failed to connect to upload service on port 3000";
+          }
+        } else if (err instanceof Error) {
+          errorObj.message = err.message;
+        }
+
+        const failedIdx = PIPELINE_STEPS.findIndex(s => s.key === errorObj.step);
+        const idx = failedIdx >= 0 ? failedIdx : 0;
+
+        setState(prev => ({
+          ...prev,
+          steps: buildSteps(idx, true),
+          currentStepIndex: idx,
+          status: "failed",
+          error: errorObj,
+          isFailed: true,
+          connectionStatus: "disconnected",
+        }));
+      });
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [id, uploadComplete, uploadError]);
+  }, [activeId, repoUrl, initialError, onIdAssigned]);
 
-  // Connect SSE + polling fallback for deployment progress
+  // Phase 2: Deploy Tracking (SSE + interval polling fallback once activeId is known)
   useEffect(() => {
-    if (!id || !uploadComplete || uploadError) return;
+    if (!activeId) return;
 
     isTerminalRef.current = false;
-    const deployStatusUrl = `http://localhost:3002/api/v1/status/${id}`;
+    const deployStatusUrl = `http://localhost:3002/api/v1/status/${activeId}`;
 
     const handleStatusPayload = (data: {
       status: string;
@@ -185,7 +237,6 @@ export function useDeploymentStatus(
     }) => {
       const { status, message, logs: logData, error } = data;
 
-      // Accumulate logs
       if (typeof logData === "string") {
         logsRef.current = [...logsRef.current, logData];
       } else if (Array.isArray(logData) && logData.length > 0) {
@@ -202,6 +253,7 @@ export function useDeploymentStatus(
 
         setState(prev => ({
           ...prev,
+          deploymentId: activeId,
           steps: buildSteps(failedStepIndex >= 0 ? failedStepIndex : prev.currentStepIndex, true),
           currentStepIndex: failedStepIndex >= 0 ? failedStepIndex : prev.currentStepIndex,
           status: "failed",
@@ -217,12 +269,13 @@ export function useDeploymentStatus(
         isTerminalRef.current = true;
         setState(prev => ({
           ...prev,
-          steps: buildSteps(7, false), // All steps completed
+          deploymentId: activeId,
+          steps: buildSteps(7, false),
           currentStepIndex: 6,
           status: "deployed",
           logs: [...logsRef.current],
           isComplete: true,
-          deployedUrl: `http://${id}.localhost:3001`,
+          deployedUrl: `http://${activeId}.localhost:3001`,
           connectionStatus: "connected",
         }));
         return;
@@ -232,6 +285,7 @@ export function useDeploymentStatus(
       if (stepIndex !== undefined && stepIndex >= 0) {
         setState(prev => ({
           ...prev,
+          deploymentId: activeId,
           steps: buildSteps(stepIndex, false),
           currentStepIndex: stepIndex,
           status: "deploying",
@@ -241,7 +295,7 @@ export function useDeploymentStatus(
       }
     };
 
-    // 1. Setup EventSource
+    // EventSource
     let es: EventSource | null = null;
     try {
       es = new EventSource(deployStatusUrl);
@@ -270,7 +324,7 @@ export function useDeploymentStatus(
       // EventSource failed to initialize
     }
 
-    // 2. Setup interval polling fallback
+    // Polling fallback every 1.5s
     const pollStatus = async () => {
       if (isTerminalRef.current) return;
       try {
@@ -289,7 +343,6 @@ export function useDeploymentStatus(
       }
     };
 
-    // Run immediate check and then poll every 1.5s
     pollStatus();
     const pollInterval = setInterval(() => {
       if (isTerminalRef.current) {
@@ -306,7 +359,7 @@ export function useDeploymentStatus(
       }
       eventSourceRef.current = null;
     };
-  }, [id, uploadComplete, uploadError]);
+  }, [activeId]);
 
   return state;
 }
