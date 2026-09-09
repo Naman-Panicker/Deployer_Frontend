@@ -36,7 +36,7 @@ export function WebhookSetup({ projectId, branch }: WebhookSetupProps) {
           Payload URL
         </label>
         <div className="flex items-center gap-1.5">
-          <div className="flex-1 overflow-x-auto border border-input bg-card/60 p-2 font-mono text-[11px] select-all truncate">
+          <div className="flex-1 overflow-x-auto border border-input/60 bg-card p-2 font-mono text-[11px] select-all truncate rounded-md">
             {webhookUrl}
           </div>
           <Button
@@ -56,7 +56,7 @@ export function WebhookSetup({ projectId, branch }: WebhookSetupProps) {
           Content type
         </label>
         <div className="flex items-center gap-1.5">
-          <div className="flex-1 border border-input bg-card/60 p-2 font-mono text-[11px]">
+          <div className="flex-1 border border-input/60 bg-card p-2 font-mono text-[11px] rounded-md">
             {contentType}
           </div>
           <Button
@@ -71,7 +71,7 @@ export function WebhookSetup({ projectId, branch }: WebhookSetupProps) {
       </div>
 
       {/* Step by step checklist */}
-      <div className="border border-border/80 bg-muted/20 p-3 space-y-2">
+      <div className="border border-border/60 bg-card/60 p-3.5 space-y-2 rounded-xl">
         <span className="font-semibold text-foreground block">
           Setup Instructions for GitHub:
         </span>

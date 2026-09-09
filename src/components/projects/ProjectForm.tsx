@@ -174,7 +174,7 @@ export function ProjectForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+        <div className="border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive rounded-lg">
           {error}
         </div>
       )}
@@ -197,7 +197,7 @@ export function ProjectForm({
         <div className="flex items-center justify-between">
           <Label htmlFor="project-repo">Git Repository URL</Label>
           {repoAccessStatus === "verified" && (
-            <span className="font-mono text-[10px] text-primary">
+            <span className="font-mono text-[10px] text-emerald-400">
               [ACCESS CONFIRMED]
             </span>
           )}
@@ -232,7 +232,7 @@ export function ProjectForm({
 
       {/* Branch Section: Visible only when repo access is received */}
       {repoAccessStatus === "idle" && (
-        <div className="border border-dashed border-border bg-muted/10 p-3 space-y-1">
+        <div className="border border-dashed border-border/60 bg-muted/10 p-3.5 space-y-1 rounded-xl">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs font-semibold text-muted-foreground">
               Default Branch: [AWAITING REPOSITORY ACCESS]
@@ -248,7 +248,7 @@ export function ProjectForm({
       )}
 
       {repoAccessStatus === "checking" && (
-        <div className="border border-border bg-muted/30 p-3 space-y-1">
+        <div className="border border-border/60 bg-muted/20 p-3.5 space-y-1 rounded-xl">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs font-semibold text-foreground animate-pulse">
               Default Branch: [VERIFYING REPOSITORY ACCESS...]
@@ -261,7 +261,7 @@ export function ProjectForm({
       )}
 
       {repoAccessStatus === "error" && (
-        <div className="border border-destructive/40 bg-destructive/10 p-3 space-y-2">
+        <div className="border border-destructive/30 bg-destructive/10 p-3.5 space-y-2 rounded-xl">
           <div className="flex items-start justify-between">
             <div>
               <span className="font-mono text-xs font-semibold text-destructive">
@@ -320,7 +320,7 @@ export function ProjectForm({
       )}
 
       {repoAccessStatus === "verified" && (
-        <div className="space-y-1.5 border border-border bg-card p-3">
+        <div className="space-y-1.5 border border-border/60 bg-card p-3.5 rounded-xl">
           <div className="flex items-center justify-between">
             <Label htmlFor="project-branch" className="text-xs font-semibold">
               Default Branch
@@ -332,7 +332,7 @@ export function ProjectForm({
               <button
                 type="button"
                 onClick={() => verifyRepo(repoUrl, branch, githubToken)}
-                className="text-[10px] text-primary underline hover:text-foreground font-mono"
+                className="text-[10px] text-muted-foreground underline hover:text-foreground font-mono"
               >
                 Refresh
               </button>
@@ -344,7 +344,7 @@ export function ProjectForm({
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
             disabled={isLoading}
-            className="h-8 w-full rounded-none border border-input bg-background px-2.5 py-1 text-xs font-mono text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-8 w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs font-mono text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             {branches.map((b) => (
               <option key={b} value={b}>
@@ -359,7 +359,7 @@ export function ProjectForm({
       )}
 
       {repoAccessStatus === "manual" && (
-        <div className="space-y-1.5 border border-dashed border-border bg-muted/10 p-3">
+        <div className="space-y-1.5 border border-dashed border-border/60 bg-muted/10 p-3.5 rounded-xl">
           <div className="flex items-center justify-between">
             <Label htmlFor="project-branch-manual" className="text-xs font-semibold">
               Default Branch (Manual Specification)

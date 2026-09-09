@@ -41,7 +41,7 @@ export function DeployButton({
           Deploy
         </Button>
       ) : (
-        <div className="flex items-center gap-1.5 border border-border bg-card p-1">
+        <div className="flex items-center gap-1.5 border border-border bg-card p-1 rounded-md">
           <span className="text-[11px] text-muted-foreground px-1">
             Deploy from <span className="font-mono text-foreground font-semibold">{defaultBranch || "main"}</span>?
           </span>

@@ -7,12 +7,9 @@ import DashboardPage from "@/src/pages/DashboardPage";
 import NewProjectPage from "@/src/pages/NewProjectPage";
 import ProjectDetailPage from "@/src/pages/ProjectDetailPage";
 import DeploymentLogsPage from "@/src/pages/DeploymentLogsPage";
-import { DevNavPill } from "@/src/components/layout/DevNavPill";
-
 function App() {
   return (
     <AuthProvider>
-      <DevNavPill />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />

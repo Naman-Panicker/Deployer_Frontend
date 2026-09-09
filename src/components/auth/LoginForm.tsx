@@ -1,23 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLogin } from "@/src/hooks/useAuth";
-import { useAuthContext } from "@/src/context/AuthContext";
-import { DEMO_TOKEN, MOCK_USER } from "@/src/lib/mockData";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, isLoading, error } = useLogin();
-  const { login: setAuth } = useAuthContext();
-  const navigate = useNavigate();
-
-  const handleEnterDemo = () => {
-    setAuth(DEMO_TOKEN, MOCK_USER);
-    navigate("/dashboard");
-  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -28,7 +19,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-none border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
           {error}
         </div>
       )}
@@ -74,16 +65,6 @@ export function LoginForm() {
         </Link>
       </div>
 
-      <div className="pt-2 border-t border-border">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full text-xs font-mono"
-          onClick={handleEnterDemo}
-        >
-          Enter Demo Mode (Bypass Auth)
-        </Button>
-      </div>
     </form>
   );
 }

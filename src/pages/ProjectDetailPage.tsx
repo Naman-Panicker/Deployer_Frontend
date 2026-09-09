@@ -10,6 +10,7 @@ import { useDeployments } from "@/src/hooks/useDeployments";
 import { DeployButton } from "@/src/components/deployments/DeployButton";
 import { DeploymentHistory } from "@/src/components/deployments/DeploymentHistory";
 import { DeploymentStatusBadge } from "@/src/components/deployments/DeploymentStatusBadge";
+import { ProductionDeploymentCard } from "@/src/components/deployments/ProductionDeploymentCard";
 import { EnvVarEditor } from "@/src/components/env/EnvVarEditor";
 import { WebhookSetup } from "@/src/components/webhook/WebhookSetup";
 
@@ -92,7 +93,7 @@ export function ProjectDetailPage() {
               href={liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border border-border bg-card hover:bg-muted transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border border-border rounded-md bg-card hover:bg-muted transition-colors"
             >
               <span>{project.subdomain}.localhost:8080</span>
               <span className="text-muted-foreground">↗</span>
@@ -110,67 +111,78 @@ export function ProjectDetailPage() {
         />
 
         {deleteError && (
-          <div className="border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+          <div className="border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive rounded-lg">
             {deleteError}
           </div>
         )}
 
-        {/* Project Header Banner */}
-        <div className="border border-border bg-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-xl font-bold tracking-tight">{project.name}</h1>
-              <span className="inline-flex items-center px-2 py-0.5 text-xs font-mono border border-border bg-muted/40">
-                {project.branch || "main"}
-              </span>
-              {deployments.length > 0 && (
-                <DeploymentStatusBadge status={deployments[0].status} />
-              )}
+        {/* Project Header Banner (shown on Settings/Env/Webhook tabs) */}
+        {activeTab !== "deployments" && (
+          <div className="border border-border bg-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-xl">
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-xl font-bold tracking-tight text-foreground">{project.name}</h1>
+                <span className="inline-flex items-center px-2 py-0.5 text-xs font-mono border border-border rounded-md bg-muted text-muted-foreground">
+                  {project.branch || "main"}
+                </span>
+                {deployments.length > 0 && (
+                  <DeploymentStatusBadge status={deployments[0].status} />
+                )}
+              </div>
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span>
+                  Repo:{" "}
+                  <a
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    {project.repoUrl}
+                  </a>
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span>
-                Repo:{" "}
-                <a
-                  href={project.repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-primary hover:underline"
-                >
-                  {project.repoUrl}
-                </a>
-              </span>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <DeployButton
-              projectId={project.id}
-              defaultBranch={project.branch}
-              onDeployTriggered={() => refetchDeployments()}
-            />
+            <div className="flex items-center gap-3">
+              <DeployButton
+                projectId={project.id}
+                defaultBranch={project.branch}
+                onDeployTriggered={() => refetchDeployments()}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Tab 1: Deployments & History */}
         {activeTab === "deployments" && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+          <div className="space-y-6">
+            <ProductionDeploymentCard
+              project={project}
+              latestDeployment={deployments[0]}
+              allDeployments={deployments}
+              onDeploymentChange={refetchDeployments}
+            />
+
+            <div className="space-y-3">
               <div>
-                <CardTitle className="text-sm font-semibold">Deployment History</CardTitle>
-                <CardDescription>
+                <h3 className="text-sm font-semibold tracking-tight text-foreground">
+                  Deployment History
+                </h3>
+                <p className="text-xs text-muted-foreground">
                   Real-time status, git commits, rollback triggers, and build logs.
-                </CardDescription>
+                </p>
               </div>
-            </CardHeader>
-            <CardContent>
+
               <DeploymentHistory
                 projectId={project.id}
+                branch={project.branch}
                 deployments={deployments}
                 isLoading={isLoadingDeployments}
                 onDeploymentChange={refetchDeployments}
               />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Tab 2: Environment Variables (Full Width) */}
@@ -227,9 +239,9 @@ export function ProjectDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-destructive/40 bg-destructive/5">
+            <Card className="border-destructive/30 bg-destructive/5">
               <CardHeader>
-                <CardTitle className="text-sm font-semibold text-destructive">Danger Zone</CardTitle>
+                <CardTitle className="text-sm font-semibold text-destructive">Delete Project</CardTitle>
                 <CardDescription>
                   Permanently delete this project, all deployments, logs, and stored secrets.
                 </CardDescription>

@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import api from "@/src/lib/api";
-import { getToken } from "@/src/lib/utils";
-import { DEMO_TOKEN, MOCK_LOGS } from "@/src/lib/mockData";
 import { type LogEntry, type DeploymentStatus, isTerminalStatus } from "@/src/types";
 
 interface LogsApiResponse {
@@ -15,13 +13,8 @@ export function useDeploymentLogs(
   deploymentId: string | undefined,
   status?: DeploymentStatus
 ) {
-  const [logs, setLogs] = useState<LogEntry[]>(() => {
-    if (getToken() === DEMO_TOKEN && deploymentId) {
-      return MOCK_LOGS[deploymentId] || MOCK_LOGS["dep_live_001"] || [];
-    }
-    return [];
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(() => getToken() !== DEMO_TOKEN);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPolling, setIsPolling] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,14 +25,6 @@ export function useDeploymentLogs(
   const fetchLogs = useCallback(
     async (isInitial = false) => {
       if (!projectId || !deploymentId || isFetchingRef.current) return;
-
-      if (getToken() === DEMO_TOKEN) {
-        const mockLines =
-          MOCK_LOGS[deploymentId] || MOCK_LOGS["dep_live_001"] || [];
-        setLogs(mockLines);
-        setIsLoading(false);
-        return;
-      }
 
       isFetchingRef.current = true;
 
@@ -83,13 +68,8 @@ export function useDeploymentLogs(
   // Initial fetch on mount or when deploymentId changes
   useEffect(() => {
     cursorRef.current = null;
-    if (getToken() === DEMO_TOKEN && deploymentId) {
-      setLogs(MOCK_LOGS[deploymentId] || MOCK_LOGS["dep_live_001"] || []);
-      setIsLoading(false);
-    } else {
-      setLogs([]);
-      fetchLogs(true);
-    }
+    setLogs([]);
+    fetchLogs(true);
   }, [projectId, deploymentId, fetchLogs]);
 
   // Polling management based on deployment status
@@ -97,11 +77,6 @@ export function useDeploymentLogs(
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
-    }
-
-    if (getToken() === DEMO_TOKEN) {
-      setIsPolling(false);
-      return;
     }
 
     const isFinished = status ? isTerminalStatus(status) : false;

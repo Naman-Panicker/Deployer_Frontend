@@ -142,7 +142,7 @@ export function EnvVarEditor({ projectId }: EnvVarEditorProps) {
   return (
     <div className="space-y-5">
       {/* Destructive Overwrite Warning Banner */}
-      <div className="border border-amber-600/40 bg-amber-500/10 p-3.5 text-xs text-amber-800 dark:text-amber-300 space-y-1">
+      <div className="border border-amber-600/30 bg-amber-500/10 p-3.5 text-xs text-amber-800 dark:text-amber-300 space-y-1 rounded-lg">
         <div className="font-semibold uppercase tracking-wider text-[10px]">
           Warning: Overwrite Policy
         </div>
@@ -152,31 +152,31 @@ export function EnvVarEditor({ projectId }: EnvVarEditorProps) {
       </div>
 
       {loadError && (
-        <div className="border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+        <div className="border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive rounded-lg">
           {loadError}
         </div>
       )}
 
       {saveError && (
-        <div className="border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+        <div className="border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive rounded-lg">
           {saveError}
         </div>
       )}
 
       {validationError && (
-        <div className="border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+        <div className="border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive rounded-lg">
           {validationError}
         </div>
       )}
 
       {saveSuccess && (
-        <div className="border border-emerald-600/40 bg-emerald-500/10 p-3 text-xs text-emerald-800 dark:text-emerald-300">
+        <div className="border border-emerald-600/30 bg-emerald-500/10 p-3 text-xs text-emerald-800 dark:text-emerald-300 rounded-lg">
           Environment variables updated successfully.
         </div>
       )}
 
       {/* Mode Selector & Action Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
         <div className="flex items-center gap-2">
           <Button
             type="button"
@@ -221,7 +221,7 @@ export function EnvVarEditor({ projectId }: EnvVarEditorProps) {
             <textarea
               id="bulk-env"
               rows={8}
-              className="w-full border border-input bg-transparent p-3 font-mono text-xs outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50"
+              className="w-full rounded-md border border-input bg-transparent p-3 font-mono text-xs outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50"
               placeholder={`API_KEY=secret_12345\nDATABASE_URL=postgres://user:pass@host/db\nNODE_ENV=production`}
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
@@ -249,7 +249,7 @@ export function EnvVarEditor({ projectId }: EnvVarEditorProps) {
             {rows.map((row, index) => (
               <div
                 key={index}
-                className="grid grid-cols-1 md:grid-cols-[1fr_1fr_64px_40px] gap-2 border border-border/80 p-2.5 bg-card/40 items-center"
+                className="grid grid-cols-1 md:grid-cols-[1fr_1fr_64px_40px] gap-2 border border-border/50 p-2.5 bg-card/60 rounded-lg items-center"
               >
                 <div>
                   <Input
@@ -303,12 +303,12 @@ export function EnvVarEditor({ projectId }: EnvVarEditorProps) {
           </div>
 
           {rows.length === 0 && (
-            <div className="border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+            <div className="border border-dashed border-border/60 p-8 text-center text-xs text-muted-foreground rounded-lg">
               No variables defined. Click &quot;+ Add Variable&quot; to configure one.
             </div>
           )}
 
-          <div className="pt-3 flex items-center justify-between border-t border-border">
+          <div className="pt-3 flex items-center justify-between border-t border-border/60">
             <span className="text-xs text-muted-foreground">
               {rows.filter((r) => r.key.trim()).length} variable(s) configured
             </span>

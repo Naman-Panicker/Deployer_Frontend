@@ -50,7 +50,7 @@ export function RollbackButton({
           Rollback
         </Button>
       ) : (
-        <div className="inline-flex items-center gap-1 border border-border bg-card px-1 py-0.5">
+        <div className="inline-flex items-center gap-1 border border-border bg-card px-1 py-0.5 rounded-md">
           <span className="text-[10px] text-muted-foreground">Restore this build?</span>
           <Button
             variant="destructive"

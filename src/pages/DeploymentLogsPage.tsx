@@ -50,7 +50,7 @@ export function DeploymentLogsPage() {
         </div>
 
         {/* Deployment Header Overview */}
-        <div className="border border-border bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="border border-border/60 bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl">
           <div className="flex items-center gap-3">
             {deployment && <DeploymentStatusBadge status={deployment.status} />}
             <span className="font-mono text-xs font-semibold">

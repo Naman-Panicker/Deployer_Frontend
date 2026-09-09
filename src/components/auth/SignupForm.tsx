@@ -36,7 +36,7 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {activeError && (
-        <div className="rounded-none border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
           {activeError}
         </div>
       )}

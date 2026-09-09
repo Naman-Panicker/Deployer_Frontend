@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import api from "@/src/lib/api";
-import { getToken } from "@/src/lib/utils";
-import { DEMO_TOKEN, MOCK_ENV_VARS } from "@/src/lib/mockData";
 import type { EnvVarPreview, EnvVarInput } from "@/src/types";
 
 interface EnvVarsResponse {
@@ -10,31 +8,12 @@ interface EnvVarsResponse {
 }
 
 export function useEnvVars(projectId: string | undefined) {
-  const [envVars, setEnvVars] = useState<EnvVarPreview[]>(() => {
-    if (getToken() === DEMO_TOKEN && projectId) {
-      return (
-        MOCK_ENV_VARS[projectId] ||
-        MOCK_ENV_VARS["proj_nextjs_portfolio"] ||
-        []
-      );
-    }
-    return [];
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(() => getToken() !== DEMO_TOKEN);
+  const [envVars, setEnvVars] = useState<EnvVarPreview[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchEnvVars = useCallback(async () => {
     if (!projectId) return;
-
-    if (getToken() === DEMO_TOKEN) {
-      const mockList =
-        MOCK_ENV_VARS[projectId] ||
-        MOCK_ENV_VARS["proj_nextjs_portfolio"] ||
-        [];
-      setEnvVars([...mockList]);
-      setIsLoading(false);
-      return;
-    }
 
     setIsLoading(true);
     setError(null);
@@ -78,15 +57,6 @@ export function useSaveEnvVars() {
   ): Promise<boolean> => {
     setIsSaving(true);
     setError(null);
-
-    if (getToken() === DEMO_TOKEN) {
-      MOCK_ENV_VARS[projectId] = envVars.map((v) => ({
-        key: v.key,
-        preview: "••••" + (v.value ? v.value.slice(-4) : "••••"),
-      }));
-      setIsSaving(false);
-      return true;
-    }
 
     try {
       await api.post(`/api/projects/${projectId}/env`, { envVars });

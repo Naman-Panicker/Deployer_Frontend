@@ -1,4 +1,4 @@
-import { type DeploymentStatus, isTerminalStatus } from "@/src/types";
+import { type DeploymentStatus } from "@/src/types";
 
 interface DeploymentStatusBadgeProps {
   status: DeploymentStatus;
@@ -8,17 +8,17 @@ export function DeploymentStatusBadge({ status }: DeploymentStatusBadgeProps) {
   const getBadgeStyle = () => {
     switch (status) {
       case "DEPLOYED":
-        return "border-emerald-600/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10";
+        return "text-[#7dff95] bg-[#7dff95]/15";
       case "FAILED":
-        return "border-destructive/40 text-destructive bg-destructive/10";
+        return "text-[#ff8080] bg-[#ff8080]/15";
       case "BUILDING":
-        return "border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10";
+        return "text-[#ffbc5e] bg-[#ffbc5e]/15";
       case "DOWNLOADING":
       case "UPLOADING_BUILD":
-        return "border-blue-500/40 text-blue-600 dark:text-blue-400 bg-blue-500/10";
+        return "text-[#87d1ff] bg-[#87d1ff]/15";
       case "QUEUED":
       default:
-        return "border-border text-muted-foreground bg-muted/30";
+        return "text-[#bed334] bg-[#bed334]/15";
     }
   };
 
@@ -41,17 +41,10 @@ export function DeploymentStatusBadge({ status }: DeploymentStatusBadgeProps) {
     }
   };
 
-  const isInProgress = !isTerminalStatus(status);
-
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-mono border rounded-none ${getBadgeStyle()}`}
+      className={`inline-flex items-center px-2 py-0.5 text-[11px] font-mono font-medium rounded-md ${getBadgeStyle()}`}
     >
-      {isInProgress ? (
-        <span className="w-1.5 h-1.5 rounded-none bg-current opacity-80" />
-      ) : (
-        <span className="w-1.5 h-1.5 rounded-none bg-current" />
-      )}
       {formatLabel()}
     </span>
   );

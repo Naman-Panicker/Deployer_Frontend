@@ -18,18 +18,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
   });
 
   return (
-    <Card className="flex flex-col justify-between hover:border-foreground/30 transition-colors border border-border min-w-0 overflow-hidden">
+    <Card className="flex flex-col justify-between transition-colors min-w-0 overflow-hidden bg-card">
       <CardHeader className="cursor-pointer min-w-0" onClick={() => navigate(`/projects/${project.id}`)}>
         <div className="flex items-start justify-between gap-2 w-full min-w-0">
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-base font-medium hover:underline truncate" title={project.name}>
+            <CardTitle className="text-base font-medium hover:text-primary transition-colors truncate" title={project.name}>
               {project.name}
             </CardTitle>
-            <CardDescription className="font-mono text-xs mt-1 truncate" title={project.repoUrl}>
+            <CardDescription className="font-mono text-xs mt-1 truncate text-foreground" title={project.repoUrl}>
               {project.repoUrl}
             </CardDescription>
           </div>
-          <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium border border-border bg-muted/40">
+          <span className="shrink-0 inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-medium rounded-md bg-muted text-foreground">
             {project.branch || "main"}
           </span>
         </div>
@@ -37,12 +37,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       <CardContent className="space-y-2 min-w-0">
         <div className="flex items-center gap-1.5 text-xs min-w-0">
-          <span className="text-muted-foreground shrink-0">Domain:</span>
+          <span className="text-foreground shrink-0">Domain:</span>
           <a
             href={liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-primary hover:underline truncate min-w-0 flex-1"
+            className="font-mono text-xs text-foreground hover:text-primary hover:underline truncate min-w-0 flex-1"
             onClick={(e) => e.stopPropagation()}
             title={liveUrl}
           >
@@ -51,12 +51,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between text-xs text-muted-foreground pt-2 min-w-0">
-        <span className="truncate mr-2">Created {formattedDate}</span>
+      <CardFooter className="flex items-center justify-between text-xs text-foreground pt-2 min-w-0">
+        <span className="truncate mr-2 text-foreground">Created {formattedDate}</span>
         <Button
           variant="outline"
           size="xs"
-          className="shrink-0"
+          className="shrink-0 bg-muted text-foreground hover:bg-muted/80"
           onClick={() => navigate(`/projects/${project.id}`)}
         >
           Manage &rarr;

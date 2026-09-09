@@ -49,8 +49,12 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
               className="font-bold text-sm tracking-tight flex items-center gap-2"
               onClick={() => setIsMobileOpen(false)}
             >
+              {/* Lightning Bolt Icon from Screenshot */}
+              <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
               <span>DEPLOYER</span>
-              <span className="text-[10px] font-mono font-normal border border-border px-1 py-0.2 bg-muted/40 text-muted-foreground">
+              <span className="text-[10px] font-mono font-normal border border-border px-1.5 py-0.5 rounded-md bg-muted/40 text-muted-foreground">
                 v2.0
               </span>
             </Link>
@@ -58,7 +62,7 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
             {/* Mobile close button */}
             <button
               type="button"
-              className="md:hidden p-1 text-muted-foreground hover:text-foreground"
+              className="md:hidden p-1 text-muted-foreground hover:text-foreground rounded-md"
               onClick={() => setIsMobileOpen(false)}
             >
               ✕
@@ -76,10 +80,10 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
                 <Link
                   to="/dashboard"
                   onClick={() => setIsMobileOpen(false)}
-                  className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors border ${
                     isProjectsActive
-                      ? "bg-foreground text-background font-semibold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "bg-primary/10 text-primary font-medium border-primary/25"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40 border-transparent"
                   }`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,10 +95,10 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
                 <Link
                   to="/projects/new"
                   onClick={() => setIsMobileOpen(false)}
-                  className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors border ${
                     isNewProjectActive
-                      ? "bg-foreground text-background font-semibold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "bg-primary/10 text-primary font-medium border-primary/25"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40 border-transparent"
                   }`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,7 +111,7 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
 
             {/* Contextual Active Project Navigation */}
             {isProjectDetail && activeProjectId && (
-              <div className="space-y-1 pt-3 border-t border-border/60">
+              <div className="space-y-1 pt-3 border-t border-border">
                 <div className="px-2 pb-1 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Project Scope
@@ -123,10 +127,10 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
                   <Link
                     to={`/projects/${activeProjectId}?tab=deployments`}
                     onClick={() => setIsMobileOpen(false)}
-                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors border ${
                       currentTab === "deployments" && !params.dId
-                        ? "bg-foreground text-background font-semibold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        ? "bg-primary/10 text-primary font-medium border-primary/25"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/40 border-transparent"
                     }`}
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,10 +142,10 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
                   <Link
                     to={`/projects/${activeProjectId}?tab=env`}
                     onClick={() => setIsMobileOpen(false)}
-                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors border ${
                       currentTab === "env"
-                        ? "bg-foreground text-background font-semibold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        ? "bg-primary/10 text-primary font-medium border-primary/25"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/40 border-transparent"
                     }`}
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,10 +157,10 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
                   <Link
                     to={`/projects/${activeProjectId}?tab=webhook`}
                     onClick={() => setIsMobileOpen(false)}
-                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors border ${
                       currentTab === "webhook"
-                        ? "bg-foreground text-background font-semibold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        ? "bg-primary/10 text-primary font-medium border-primary/25"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/40 border-transparent"
                     }`}
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,10 +172,10 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
                   <Link
                     to={`/projects/${activeProjectId}?tab=settings`}
                     onClick={() => setIsMobileOpen(false)}
-                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                    className={`flex items-center gap-2.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors border ${
                       currentTab === "settings"
-                        ? "bg-foreground text-background font-semibold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        ? "bg-primary/10 text-primary font-medium border-primary/25"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/40 border-transparent"
                     }`}
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,7 +194,7 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
         <div className="border-t border-border p-4 bg-card/40 space-y-2">
           {user?.email && (
             <div className="flex items-center gap-2 text-xs truncate">
-              <span className="w-5 h-5 rounded-none bg-muted flex items-center justify-center font-mono text-[10px] font-bold text-foreground shrink-0 border border-border">
+              <span className="w-5 h-5 rounded-md bg-muted flex items-center justify-center font-mono text-[10px] font-bold text-foreground shrink-0 border border-border">
                 {user.email.charAt(0).toUpperCase()}
               </span>
               <span className="truncate text-muted-foreground text-[11px] font-mono">
@@ -200,9 +204,8 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
           )}
 
           <div className="flex items-center justify-between pt-1">
-            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
-              <span className="w-1.5 h-1.5 rounded-none bg-emerald-700 dark:bg-emerald-400" />
-              Gateway 9000
+            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono font-medium">
+              Gateway 9000: Online
             </span>
             <Button
               variant="outline"
@@ -224,7 +227,7 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
             {/* Mobile Hamburger Button */}
             <button
               type="button"
-              className="md:hidden p-1.5 border border-border hover:bg-muted text-foreground"
+              className="md:hidden p-1.5 rounded-md border border-border hover:bg-muted text-foreground"
               onClick={() => setIsMobileOpen(true)}
               aria-label="Open sidebar navigation"
             >
@@ -241,15 +244,18 @@ export function AppShell({ children, title, action, projectName }: AppShellProps
           </div>
 
           <div className="flex items-center gap-3">
-            {action}
-            {!isNewProjectActive && (
-              <Button
-                size="xs"
-                onClick={() => navigate("/projects/new")}
-                className="text-xs hidden sm:inline-flex"
-              >
-                + New Project
-              </Button>
+            {action ? (
+              action
+            ) : (
+              !isNewProjectActive && (
+                <Button
+                  size="xs"
+                  onClick={() => navigate("/projects/new")}
+                  className="text-xs hidden sm:inline-flex"
+                >
+                  + New Project
+                </Button>
+              )
             )}
           </div>
         </header>

@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import api from "@/src/lib/api";
-import { getToken } from "@/src/lib/utils";
-import { DEMO_TOKEN, MOCK_PROJECTS } from "@/src/lib/mockData";
 import type { Project } from "@/src/types";
 
 interface ProjectsResponse {
@@ -28,19 +26,11 @@ export interface UpdateProjectInput {
 }
 
 export function useProjects() {
-  const [projects, setProjects] = useState<Project[]>(() =>
-    getToken() === DEMO_TOKEN ? MOCK_PROJECTS : []
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(() => getToken() !== DEMO_TOKEN);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProjects = useCallback(async () => {
-    if (getToken() === DEMO_TOKEN) {
-      setProjects(MOCK_PROJECTS);
-      setIsLoading(false);
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
     try {
@@ -68,24 +58,12 @@ export function useProjects() {
 }
 
 export function useProject(id: string | undefined) {
-  const [project, setProject] = useState<Project | null>(() => {
-    if (getToken() === DEMO_TOKEN) {
-      return MOCK_PROJECTS.find((p) => p.id === id) || MOCK_PROJECTS[0];
-    }
-    return null;
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(() => getToken() !== DEMO_TOKEN);
+  const [project, setProject] = useState<Project | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProject = useCallback(async () => {
     if (!id) return;
-
-    if (getToken() === DEMO_TOKEN) {
-      const found = MOCK_PROJECTS.find((p) => p.id === id) || MOCK_PROJECTS[0];
-      setProject(found);
-      setIsLoading(false);
-      return;
-    }
 
     setIsLoading(true);
     setError(null);
@@ -121,20 +99,6 @@ export function useCreateProject() {
     setIsLoading(true);
     setError(null);
 
-    if (getToken() === DEMO_TOKEN) {
-      const newProj: Project = {
-        id: `proj_${Date.now()}`,
-        name: data.name,
-        repoUrl: data.repoUrl,
-        subdomain: data.subdomain,
-        branch: data.branch || "main",
-        createdAt: new Date().toISOString(),
-      };
-      MOCK_PROJECTS.push(newProj);
-      setIsLoading(false);
-      return newProj;
-    }
-
     try {
       const res = await api.post<ProjectResponse | Project>("/api/projects", data);
       const created = "project" in (res.data as ProjectResponse) && (res.data as ProjectResponse).project
@@ -164,17 +128,6 @@ export function useUpdateProject() {
     setIsLoading(true);
     setError(null);
 
-    if (getToken() === DEMO_TOKEN) {
-      const idx = MOCK_PROJECTS.findIndex((p) => p.id === id);
-      if (idx !== -1) {
-        MOCK_PROJECTS[idx] = { ...MOCK_PROJECTS[idx], ...data };
-        setIsLoading(false);
-        return MOCK_PROJECTS[idx];
-      }
-      setIsLoading(false);
-      return null;
-    }
-
     try {
       const res = await api.put<ProjectResponse | Project>(`/api/projects/${id}`, data);
       const updated = "project" in (res.data as ProjectResponse) && (res.data as ProjectResponse).project
@@ -203,15 +156,6 @@ export function useDeleteProject() {
   const deleteProject = async (id: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
-
-    if (getToken() === DEMO_TOKEN) {
-      const idx = MOCK_PROJECTS.findIndex((p) => p.id === id);
-      if (idx !== -1) {
-        MOCK_PROJECTS.splice(idx, 1);
-      }
-      setIsLoading(false);
-      return true;
-    }
 
     try {
       await api.delete(`/api/projects/${id}`);

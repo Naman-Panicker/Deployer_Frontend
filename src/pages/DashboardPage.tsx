@@ -22,14 +22,14 @@ export function DashboardPage() {
           <div className="text-sm text-muted-foreground">Loading projects...</div>
         </div>
       ) : error ? (
-        <div className="border border-destructive/50 bg-destructive/10 p-4 text-xs text-destructive flex items-center justify-between">
+        <div className="border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive flex items-center justify-between rounded-xl">
           <span>{error}</span>
           <Button variant="outline" size="xs" onClick={refetch}>
             Retry
           </Button>
         </div>
       ) : projects.length === 0 ? (
-        <div className="border border-dashed border-border py-16 text-center space-y-4">
+        <div className="border border-dashed border-border/60 bg-card/40 py-16 text-center space-y-4 rounded-xl">
           <div className="space-y-1">
             <h2 className="text-base font-medium">No projects found</h2>
             <p className="text-xs text-muted-foreground">

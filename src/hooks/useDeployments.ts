@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import api from "@/src/lib/api";
-import { getToken } from "@/src/lib/utils";
-import { DEMO_TOKEN, MOCK_DEPLOYMENTS } from "@/src/lib/mockData";
 import { type Deployment, isTerminalStatus } from "@/src/types";
 
 interface DeploymentsResponse {
@@ -14,33 +12,14 @@ interface DeployTriggerResponse {
 }
 
 export function useDeployments(projectId: string | undefined) {
-  const [deployments, setDeployments] = useState<Deployment[]>(() => {
-    if (getToken() === DEMO_TOKEN && projectId) {
-      return (
-        MOCK_DEPLOYMENTS[projectId] ||
-        MOCK_DEPLOYMENTS["proj_nextjs_portfolio"] ||
-        []
-      );
-    }
-    return [];
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(() => getToken() !== DEMO_TOKEN);
+  const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchDeployments = useCallback(
     async (quiet = false) => {
       if (!projectId) return;
-
-      if (getToken() === DEMO_TOKEN) {
-        const mockList =
-          MOCK_DEPLOYMENTS[projectId] ||
-          MOCK_DEPLOYMENTS["proj_nextjs_portfolio"] ||
-          [];
-        setDeployments([...mockList]);
-        setIsLoading(false);
-        return mockList;
-      }
 
       if (!quiet) setIsLoading(true);
       setError(null);
@@ -115,24 +94,6 @@ export function useTriggerDeploy() {
     setIsDeploying(true);
     setError(null);
 
-    if (getToken() === DEMO_TOKEN) {
-      const newId = `dep_demo_${Date.now()}`;
-      const newDep: Deployment = {
-        id: newId,
-        status: "BUILDING",
-        commitHash: "e5f6a7b",
-        triggerType: "MANUAL",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      if (!MOCK_DEPLOYMENTS[projectId]) {
-        MOCK_DEPLOYMENTS[projectId] = [];
-      }
-      MOCK_DEPLOYMENTS[projectId].unshift(newDep);
-      setIsDeploying(false);
-      return newId;
-    }
-
     try {
       const payload = branch ? { branch } : {};
       const res = await api.post<DeployTriggerResponse>(
@@ -169,24 +130,6 @@ export function useRollback() {
   ): Promise<string | null> => {
     setIsRollingBack(true);
     setError(null);
-
-    if (getToken() === DEMO_TOKEN) {
-      const newId = `dep_rollback_${Date.now()}`;
-      const newDep: Deployment = {
-        id: newId,
-        status: "DEPLOYED",
-        commitHash: "a8f3c91",
-        triggerType: "ROLLBACK",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      if (!MOCK_DEPLOYMENTS[projectId]) {
-        MOCK_DEPLOYMENTS[projectId] = [];
-      }
-      MOCK_DEPLOYMENTS[projectId].unshift(newDep);
-      setIsRollingBack(false);
-      return newId;
-    }
 
     try {
       const res = await api.post<DeployTriggerResponse>(

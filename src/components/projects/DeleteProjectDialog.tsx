@@ -32,7 +32,7 @@ export function DeleteProjectDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4">
-      <Card className="w-full max-w-md border-destructive/50">
+      <Card className="w-full max-w-md border-destructive/40 bg-card rounded-xl">
         <CardHeader>
           <CardTitle className="text-destructive font-semibold">Delete Project</CardTitle>
           <CardDescription>

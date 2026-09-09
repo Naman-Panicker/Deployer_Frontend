@@ -29,9 +29,8 @@ export function DevNavPill() {
   ];
 
   return (
-    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 bg-card border border-border px-3 py-1.5 text-xs rounded-none">
-      <div className="flex items-center gap-1.5 pr-2 border-r border-border font-medium text-foreground">
-        <span className="w-2 h-2 rounded-none bg-primary inline-block" />
+    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 bg-card border border-border p-1.5 text-xs rounded-xl">
+      <div className="flex items-center px-1.5 pr-2 border-r border-border font-medium text-foreground">
         <span className="text-[11px] font-mono font-semibold">DEV PREVIEW</span>
       </div>
 
@@ -49,9 +48,9 @@ export function DevNavPill() {
                   setTimeout(() => navigate(p.path), 50);
                 }
               }}
-              className={`px-2 py-0.5 text-[11px] font-mono transition-colors border ${
+              className={`px-2 py-0.5 text-[11px] font-mono rounded-md transition-colors border ${
                 isActive
-                  ? "bg-foreground text-background font-semibold border-foreground"
+                  ? "bg-primary text-primary-foreground font-semibold border-primary"
                   : "hover:bg-muted text-muted-foreground hover:text-foreground border-transparent"
               }`}
             >

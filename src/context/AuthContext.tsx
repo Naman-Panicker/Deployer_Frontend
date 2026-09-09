@@ -3,7 +3,8 @@ import type { User } from "@/src/types";
 import api from "@/src/lib/api";
 import { getToken, setToken as saveToken, clearToken } from "@/src/lib/utils";
 
-import { DEMO_TOKEN, MOCK_USER } from "@/src/lib/mockData";
+// Cleanup safety: if an older session stored "demo-dev-token", purge it
+const LEGACY_DEMO_TOKEN = "demo-dev-token";
 
 interface AuthContextType {
   user: User | null;
@@ -16,20 +17,26 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setTokenState] = useState<string | null>(() => getToken());
-  const [user, setUser] = useState<User | null>(() => (getToken() === DEMO_TOKEN ? MOCK_USER : null));
-  const [isLoading, setIsLoading] = useState<boolean>(() => getToken() !== DEMO_TOKEN && !!getToken());
+  const [token, setTokenState] = useState<string | null>(() => {
+    const t = getToken();
+    if (t === LEGACY_DEMO_TOKEN) {
+      clearToken();
+      return null;
+    }
+    return t;
+  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    const t = getToken();
+    return !!t && t !== LEGACY_DEMO_TOKEN;
+  });
 
   useEffect(() => {
     const existingToken = getToken();
-    if (!existingToken) {
-      setIsLoading(false);
-      return;
-    }
-
-    if (existingToken === DEMO_TOKEN) {
-      setUser(MOCK_USER);
-      setTokenState(DEMO_TOKEN);
+    if (!existingToken || existingToken === LEGACY_DEMO_TOKEN) {
+      if (existingToken === LEGACY_DEMO_TOKEN) {
+        clearToken();
+      }
       setIsLoading(false);
       return;
     }

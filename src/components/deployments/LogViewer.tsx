@@ -44,19 +44,17 @@ export function LogViewer({ logs, isLoading, isPolling, error }: LogViewerProps)
   };
 
   return (
-    <div className="border border-border bg-card flex flex-col h-[600px] overflow-hidden">
+    <div className="border border-border bg-card flex flex-col h-[600px] overflow-hidden rounded-xl">
       {/* Top Console Bar */}
       <div className="border-b border-border bg-muted/40 p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2">
           <span className="font-mono font-semibold">Console Output</span>
           {isPolling ? (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-mono border border-border text-foreground bg-muted/30">
-              <span className="w-1.5 h-1.5 rounded-none bg-primary opacity-80" />
+            <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-medium border border-sky-500/40 text-sky-700 dark:text-sky-400 bg-sky-500/10 rounded-md">
               POLLING (2s)
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-mono border border-border text-muted-foreground bg-muted/20">
-              <span className="w-1.5 h-1.5 rounded-none bg-muted-foreground" />
+            <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-medium border border-border text-muted-foreground bg-muted/30 rounded-md">
               IDLE
             </span>
           )}
